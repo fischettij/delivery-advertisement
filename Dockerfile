@@ -1,4 +1,3 @@
-# Usa la imagen oficial de Golang
 FROM golang:1.21
 
 WORKDIR /go/src/app

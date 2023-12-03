@@ -5,3 +5,5 @@ services:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      - CSV_RESOURCE_URL=
