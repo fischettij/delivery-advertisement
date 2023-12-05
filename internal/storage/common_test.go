@@ -8,7 +8,7 @@ import (
 
 func TestIsInRangeToRadius(t *testing.T) {
 	type args struct {
-		establishment storage.Establishment
+		establishment *storage.Establishment
 		latitude      float64
 		longitude     float64
 	}
@@ -20,7 +20,7 @@ func TestIsInRangeToRadius(t *testing.T) {
 		{
 			name: "given_a_latitude_and_longitude_when_establishment_is_in_range_then_return_true",
 			args: args{
-				establishment: storage.Establishment{
+				establishment: &storage.Establishment{
 					Latitude:           51.194253600000003,
 					Longitude:          6.455508,
 					AvailabilityRadios: 5,
@@ -33,7 +33,7 @@ func TestIsInRangeToRadius(t *testing.T) {
 		{
 			name: "given_a_latitude_and_longitude_when_establishment_is_out_of_range_then_return_true",
 			args: args{
-				establishment: storage.Establishment{
+				establishment: &storage.Establishment{
 					Latitude:           51.194253600000003,
 					Longitude:          6.455508,
 					AvailabilityRadios: 5,

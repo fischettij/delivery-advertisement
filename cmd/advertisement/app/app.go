@@ -1,6 +1,8 @@
 package app
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -25,7 +27,14 @@ func Start() {
 	}
 	defer logger.Sync()
 
-	dbstorage, err := storage.NewMemoryStorage(logger)
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", config.PostgresDB.User, config.PostgresDB.Password, config.PostgresDB.DataBaseName)
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+	defer db.Close()
+
+	dbstorage, err := storage.NewPostgresDatabase(logger, db)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -41,6 +50,7 @@ func Start() {
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
+
 	err = manager.Start()
 	if err != nil {
 		logger.Fatal(err.Error())
@@ -52,7 +62,8 @@ func Start() {
 	}
 	handlers.ConfigureRoutes(r, deliveryServicesHandler)
 
-	err = r.Run()
+	err = r.Run(fmt.Sprintf(":%s", config.Port))
+	logger.Info(fmt.Sprintf("application started and listening on port %s", config.Port))
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
