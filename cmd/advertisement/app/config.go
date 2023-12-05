@@ -31,11 +31,12 @@ func LoadConfig() (*Config, error) {
 		DataBaseName: os.Getenv("POSTGRES_DB"),
 	}
 
-	port := os.Getenv("CSV_RESOURCE_URL")
-	filePollingIntervalMinutesString := os.Getenv("POSTGRES_DB")
+	port := os.Getenv("PORT")
+
+	filePollingIntervalMinutesString := os.Getenv("FILE_POLLING_INTERVAL_MINUTES")
 	filePollingIntervalMinutes, err := strconv.Atoi(filePollingIntervalMinutesString)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing latitude: %w", err)
+		return nil, fmt.Errorf("error parsing FILE_POLLING_INTERVAL_MINUTES: %w", err)
 	}
 	if filePollingIntervalMinutes < 1 {
 		filePollingIntervalMinutes = defaultFilePollingIntervalMinutes
@@ -46,9 +47,9 @@ func LoadConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		FileDownloaderResourceURL: os.Getenv("CSV_RESOURCE_URL"),
-		PostgresDB:                dbConfig,
-		Port:                      port,
+		FileDownloaderResourceURL:  os.Getenv("CSV_RESOURCE_URL"),
+		PostgresDB:                 dbConfig,
+		Port:                       port,
 		FilePollingIntervalMinutes: filePollingIntervalMinutes,
 	}
 
