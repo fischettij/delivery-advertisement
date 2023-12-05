@@ -3,6 +3,7 @@ package deliverys
 import (
 	"context"
 	"errors"
+	"time"
 )
 
 type Storage interface {
@@ -11,15 +12,18 @@ type Storage interface {
 }
 
 type FileDownloader interface {
-	DownloadFile(fileName string) error
+	DownloadFile(fileName string) (string, error)
+	RemoveFile(name string) error
 }
 
 type Manager struct {
-	storage    Storage
-	downloader FileDownloader
+	storage             Storage
+	downloader          FileDownloader
+	csvVersion          string
+	filePollingInterval time.Duration
 }
 
-func NewManager(storage Storage, downloader FileDownloader) (*Manager, error) {
+func NewManager(storage Storage, downloader FileDownloader, filePollingInterval time.Duration) (*Manager, error) {
 	if storage == nil {
 		return nil, errors.New("storage can not be nil")
 	}
@@ -29,19 +33,39 @@ func NewManager(storage Storage, downloader FileDownloader) (*Manager, error) {
 	}
 
 	return &Manager{
-		storage:    storage,
-		downloader: downloader,
+		storage:             storage,
+		downloader:          downloader,
+		filePollingInterval: filePollingInterval,
 	}, nil
 }
 
-func (m *Manager) Start() error {
-	fileName := "database.csv"
-	err := m.downloader.DownloadFile(fileName)
-	if err != nil {
-		return err
-	}
-	err = m.storage.LoadFromFile(fileName)
-	return err
+// Start Every 10 minutes it validates if there is a new version of the file and updates it if necessary
+func (m *Manager) Start(done chan<- error) {
+	go func() {
+		for {
+			fileName := "database.csv"
+			md5, err := m.downloader.DownloadFile(fileName)
+			if err != nil {
+				done <- err
+				return
+			}
+			m.csvVersion = md5
+
+			err = m.storage.LoadFromFile(fileName)
+			if err != nil {
+				done <- err
+				return
+			}
+
+			err = m.downloader.RemoveFile(fileName)
+			if err != nil {
+				done <- err
+				return
+			}
+
+			time.Sleep(m.filePollingInterval)
+		}
+	}()
 }
 
 func (m *Manager) DeliveryServicesNearLocation(ctx context.Context, latitude, longitude float64) ([]string, error) {

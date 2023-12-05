@@ -42,6 +42,7 @@ func (d DeliveryServicesHandler) FindNearLocation(c *gin.Context) {
 		return
 	}
 
+	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, deliveryServicesResponse{IDs: deliveryServicesIDs})
 }
 

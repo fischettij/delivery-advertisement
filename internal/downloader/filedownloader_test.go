@@ -75,8 +75,10 @@ func (suite *DownloaderSuite) TestLoadFromFile() {
 		suite.Require().NoError(err)
 		suite.Require().NotNil(dw)
 
-		err = dw.DownloadFile(testFilePath)
+		expectedMD5 := "dda39e49f0262d1b529c4e48f3ece994"
+		md5, err := dw.DownloadFile(testFilePath)
 		suite.Require().NoError(err)
+		suite.Require().Equal(expectedMD5, md5)
 
 		// Validate file content
 		downloadedFile, err := os.ReadFile(testFilePath)

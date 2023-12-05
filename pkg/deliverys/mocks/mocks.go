@@ -87,15 +87,30 @@ func (m *MockFileDownloader) EXPECT() *MockFileDownloaderMockRecorder {
 }
 
 // DownloadFile mocks base method.
-func (m *MockFileDownloader) DownloadFile(fileName string) error {
+func (m *MockFileDownloader) DownloadFile(fileName string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DownloadFile", fileName)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DownloadFile indicates an expected call of DownloadFile.
 func (mr *MockFileDownloaderMockRecorder) DownloadFile(fileName interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DownloadFile", reflect.TypeOf((*MockFileDownloader)(nil).DownloadFile), fileName)
+}
+
+// RemoveFile mocks base method.
+func (m *MockFileDownloader) RemoveFile(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveFile", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveFile indicates an expected call of RemoveFile.
+func (mr *MockFileDownloaderMockRecorder) RemoveFile(name interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveFile", reflect.TypeOf((*MockFileDownloader)(nil).RemoveFile), name)
 }

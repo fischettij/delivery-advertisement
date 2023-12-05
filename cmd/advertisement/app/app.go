@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty/v2"
@@ -19,13 +20,16 @@ import (
 func Start() {
 	r := gin.Default()
 
-	config := LoadConfig()
-
 	logger, err := zap.NewProduction()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer logger.Sync()
+
+	config, err := LoadConfig()
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
 
 	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", config.PostgresDB.User, config.PostgresDB.Password, config.PostgresDB.DataBaseName)
 	db, err := sql.Open("postgres", connStr)
@@ -46,15 +50,12 @@ func Start() {
 		logger.Fatal(err.Error())
 	}
 
-	manager, err := deliverys.NewManager(dbstorage, fileDownloader)
+	manager, err := deliverys.NewManager(dbstorage, fileDownloader, time.Duration(config.FilePollingIntervalMinutes)*time.Minute)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
-
-	err = manager.Start()
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
+	done := make(chan error)
+	manager.Start(done)
 
 	deliveryServicesHandler, err := handlers.NewDeliveryServicesHandler(manager)
 	if err != nil {
@@ -63,8 +64,13 @@ func Start() {
 	handlers.ConfigureRoutes(r, deliveryServicesHandler)
 
 	err = r.Run(fmt.Sprintf(":%s", config.Port))
-	logger.Info(fmt.Sprintf("application started and listening on port %s", config.Port))
 	if err != nil {
+		logger.Fatal(err.Error())
+	}
+	logger.Info(fmt.Sprintf("application started and listening on port %s", config.Port))
+
+	select {
+	case err = <-done:
 		logger.Fatal(err.Error())
 	}
 }
