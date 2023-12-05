@@ -37,7 +37,7 @@ func NewPostgresDatabase(logger Logger, db *sql.DB) (*Postgres, error) {
 }
 
 func (p *Postgres) LoadFromFile(path string) error {
-	_, err := p.db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", establishmentsTableName))
+	_, err := p.db.Exec("TRUNCATE TABLE $1", establishmentsTableName)
 	if err != nil {
 		return fmt.Errorf("error executing insert establishment: %w", err)
 	}
@@ -59,7 +59,7 @@ func (p *Postgres) LoadFromFile(path string) error {
 	return err
 }
 
-func (p *Postgres) DeliveryServicesNearLocation(ctx context.Context, latitude, longitude float64) ([]string, error) {
+func (p *Postgres) DeliveryServicesNearLocation(_ context.Context, latitude, longitude float64) ([]string, error) {
 	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar).RunWith(p.db)
 
 	// Select the locations approximately 20 km away to analyze a smaller subset.
@@ -76,7 +76,7 @@ func (p *Postgres) DeliveryServicesNearLocation(ctx context.Context, latitude, l
 		return []string{}, fmt.Errorf("error in query select of DeliveryServicesNearLocation: %w", err)
 	}
 
-	result := []string{}
+	var result []string
 	for rows.Next() {
 		var id string
 		var establismentLatitude, establismentLongitude, availabilityRadios float64

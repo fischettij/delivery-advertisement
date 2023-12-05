@@ -1,6 +1,8 @@
 package downloader
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
@@ -27,26 +29,38 @@ func NewDownloader(resourceURL string, client *resty.Client) (*Downloader, error
 	}, nil
 }
 
-func (d *Downloader) DownloadFile(fileName string) error {
+func (d *Downloader) DownloadFile(fileName string) (string, error) {
 	response, err := d.client.R().Get(d.url)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if response.StatusCode() != http.StatusOK {
-		return fmt.Errorf("failed to download CSV. status: %s", response.Status())
+		return "", fmt.Errorf("failed to download CSV. status: %s", response.Status())
 	}
 
 	file, err := os.Create(fileName)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
 	_, err = file.Write(response.Body())
 	if err != nil {
-		return err
+		return "", err
 	}
 
+	hasher := md5.New()
+	hasher.Write(response.Body())
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
+	return hash, nil
+}
+
+func (d *Downloader) RemoveFile(fileName string) error {
+	err := os.Remove(fileName)
+	if err != nil {
+		return fmt.Errorf("error removing CSV file: %w", err)
+	}
 	return nil
 }
