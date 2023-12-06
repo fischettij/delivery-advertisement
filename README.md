@@ -10,14 +10,10 @@ cd delivery-advertisement
 #### Run with docker
 Configure the following env vars in docker-compose.yml
 
-File Download:
+File Download: 
 * `CSV_RESOURCE_URL=https://url-to-file.com/file.csv`: Url for file downloading.
-* `FilePollingIntervalMinutes=10`: Time interval in minutes for how often the file is searched 
+* `FILE_POLLING_INTERVAL_MINUTES=10`: Time interval in minutes for how often the file is searched
 
-Database: The following values has a default but can be changed. The change has to be made in `advertisement` and `db` containers
-- `POSTGRES_USER`
-- `POSTGRES_PASSWORD`
-- `POSTGRES_DB`
 
 ```bash
 sudo docker-compose up
@@ -43,15 +39,16 @@ GET /delivery-services
 
 #### Ideas and TODO
 - Document Api errors response
-- Select between implemented databases by config
 - Add retries or another recover meth for downloader. It is not good to kill the app if the file is not available or I cannot update the information. Do something smarter
-- Database avoid downtime. Two alternatives:
-  - Use two databases. While database A is in use, load information in a database B. When information was loaded, witch queries to database B.
-  - Use a second temporal database (SQLite or in Memory), load data in temp database, switch selects to the temp database while main database is loading the new data. When main datase finish switch selects and destroy temp database
-- Postgres storage:
-  - Add tests for file postgres.go.
 - In memory storage:
   - Try another data organization like a matrix and compare response times between implementations.
-  - In list (actual), insert values sorted by latitude using quick sort or similar algorithm.
-  - Search with divide and conquer strategy analyzing elements in rage of latitude -0,25 and latitude +0,25.
-- Will SQLIte in memory be performant for this solution? Maybe a poc is not difficult to do. 
+- Database avoid downtime. Two alternatives:
+  - Use a second temporal database (SQLite or in Memory), load data in temp database, switch selects to the temp database while main database is loading the new data. When main database finish switch selects and destroy temp database
+  - Use two databases. While database A is in use, load information in a database B. When information was loaded, witch queries to database B.
+- Postgres storage:
+  - Add tests for file postgres.go.
+- Will SQLIte in memory be performant for this solution? I suppose not but maybe a poc is not difficult to do. 
+- Select between implemented databases by config
+
+#### POCs
+- Postgres database: The idea was to test PostGIS to use arithmetic operations and test faster filtering. It didn't work and we tried to pre-filter the largest number of values in the database and then do the cerania calculations in the app to obtain the final result. This last test was better but the base, as expected, turned out to be a bottleneck.    

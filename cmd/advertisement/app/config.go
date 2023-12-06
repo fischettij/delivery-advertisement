@@ -13,24 +13,11 @@ const (
 
 type Config struct {
 	FileDownloaderResourceURL  string
-	PostgresDB                 PostgresDBConfig
 	Port                       string
 	FilePollingIntervalMinutes int
 }
 
-type PostgresDBConfig struct {
-	User         string
-	Password     string
-	DataBaseName string
-}
-
 func LoadConfig() (*Config, error) {
-	dbConfig := PostgresDBConfig{
-		User:         os.Getenv("POSTGRES_USER"),
-		Password:     os.Getenv("POSTGRES_PASSWORD"),
-		DataBaseName: os.Getenv("POSTGRES_DB"),
-	}
-
 	port := os.Getenv("PORT")
 
 	filePollingIntervalMinutesString := os.Getenv("FILE_POLLING_INTERVAL_MINUTES")
@@ -48,7 +35,6 @@ func LoadConfig() (*Config, error) {
 
 	config := &Config{
 		FileDownloaderResourceURL:  os.Getenv("CSV_RESOURCE_URL"),
-		PostgresDB:                 dbConfig,
 		Port:                       port,
 		FilePollingIntervalMinutes: filePollingIntervalMinutes,
 	}
