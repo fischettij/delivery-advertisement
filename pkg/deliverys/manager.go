@@ -56,12 +56,11 @@ func (m *Manager) Start(done chan<- error) {
 					done <- err
 					return
 				}
-
-				err = m.downloader.RemoveFile(fileName)
-				if err != nil {
-					done <- err
-					return
-				}
+			}
+			err = m.downloader.RemoveFile(fileName)
+			if err != nil {
+				done <- err
+				return
 			}
 			time.Sleep(m.filePollingInterval)
 		}
