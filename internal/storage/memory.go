@@ -26,6 +26,8 @@ func NewMemoryStorage(logger Logger) (*Memory, error) {
 	}, nil
 }
 
+// LoadFromFile Popula entries from csv file.
+// Expected a path to csv file.
 func (m *Memory) LoadFromFile(path string) error {
 	m.establishments = []*Establishment{}
 	m.logger.Info("in memory population from file started")
@@ -40,7 +42,8 @@ func (m *Memory) LoadFromFile(path string) error {
 	return err
 }
 
-func (m *Memory) DeliveryServicesNearLocation(ctx context.Context, latitude, longitude float64) ([]string, error) {
+// DeliveryServicesNearLocation returns establishments that are in the delivery range
+func (m *Memory) DeliveryServicesNearLocation(_ context.Context, latitude, longitude float64) ([]string, error) {
 	founded := []string{}
 
 	leftLimit := latitude - 0.2
