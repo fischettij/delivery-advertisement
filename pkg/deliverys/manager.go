@@ -49,20 +49,20 @@ func (m *Manager) Start(done chan<- error) {
 				done <- err
 				return
 			}
-			m.csvVersion = md5
+			if md5 != m.csvVcersion {
+				m.csvVersion = md5
+				err = m.storage.LoadFromFile(fileName)
+				if err != nil {
+					done <- err
+					return
+				}
 
-			err = m.storage.LoadFromFile(fileName)
-			if err != nil {
-				done <- err
-				return
+				err = m.downloader.RemoveFile(fileName)
+				if err != nil {
+					done <- err
+					return
+				}
 			}
-
-			err = m.downloader.RemoveFile(fileName)
-			if err != nil {
-				done <- err
-				return
-			}
-
 			time.Sleep(m.filePollingInterval)
 		}
 	}()
