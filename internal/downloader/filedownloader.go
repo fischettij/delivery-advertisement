@@ -29,6 +29,7 @@ func NewDownloader(resourceURL string, client *resty.Client) (*Downloader, error
 	}, nil
 }
 
+// DownloadFile Download file and return its MD5 hash
 func (d *Downloader) DownloadFile(fileName string) (string, error) {
 	response, err := d.client.R().Get(d.url)
 	if err != nil {
@@ -57,8 +58,9 @@ func (d *Downloader) DownloadFile(fileName string) (string, error) {
 	return hash, nil
 }
 
-func (d *Downloader) RemoveFile(fileName string) error {
-	err := os.Remove(fileName)
+// RemoveFile removes a file in filePath
+func (d *Downloader) RemoveFile(filePath string) error {
+	err := os.Remove(filePath)
 	if err != nil {
 		return fmt.Errorf("error removing CSV file: %w", err)
 	}
