@@ -1,7 +1,6 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -31,18 +30,10 @@ func Start() {
 		logger.Fatal(err.Error())
 	}
 
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", config.PostgresDB.User, config.PostgresDB.Password, config.PostgresDB.DataBaseName)
-	db, err := sql.Open("postgres", connStr)
+	dbstorage, err := storage.NewMemoryStorage(logger)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
-	defer db.Close()
-
-	dbstorage, err := storage.NewPostgresDatabase(logger, db)
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
-
 	restClient := resty.New()
 
 	fileDownloader, err := downloader.NewDownloader(config.FileDownloaderResourceURL, restClient)

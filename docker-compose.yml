@@ -5,23 +5,7 @@ services:
     build: .
     ports:
       - "8080:8080"
-    depends_on:
-      - db
     environment:
       - PORT=8080
       - CSV_RESOURCE_URL=
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=deliveries
-      - FilePollingIntervalMinutes=10
-
-  db:
-    image: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=deliveries
-    volumes:
-      - ./migrations/model.sql:/docker-entrypoint-initdb.d/init.sql #Create database table
+      - FILE_POLLING_INTERVAL_MINUTES=10

@@ -1,0 +1,14 @@
+{
+  "name": "delivery-advertisement-benchmark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "artillery": "^2.0.2"
+  }
+}

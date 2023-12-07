@@ -104,3 +104,32 @@ func loadFromFile(logger Logger, path string, insertFunction func(establishment 
 	}
 	return nil
 }
+
+/*
+
+
+func insertSort(list *[]Establishment, element Establishment) *[]string {
+
+	"""
+	Using divide and conquer
+	"""
+	left := 0
+	right := len(list) - 1
+	for left <= right{
+		mid := (left + right) / 2
+		if list[mid].Latitude < element.Latitude
+
+	}
+
+	if lst[mid][2] == element[2]:
+	lst.insert(mid, element)
+	return
+	elif lst[mid][2] < element[2]:
+	left = mid + 1
+	else:
+	right = mid - 1
+	lst.insert(left, element)
+
+	return nil
+}
+*/

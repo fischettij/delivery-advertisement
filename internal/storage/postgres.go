@@ -27,22 +27,20 @@ func NewPostgresDatabase(logger Logger, db *sql.DB) (*Postgres, error) {
 		return nil, errors.New("db cannot be nil")
 	}
 
-	builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar).RunWith(db)
-
 	return &Postgres{
-		db:      db,
-		builder: builder,
-		logger:  logger,
+		db:     db,
+		logger: logger,
 	}, nil
 }
 
 func (p *Postgres) LoadFromFile(path string) error {
-	_, err := p.db.Exec("TRUNCATE TABLE $1", establishmentsTableName)
+	p.logger.Info("db population from file started")
+
+	_, err := sq.StatementBuilder.PlaceholderFormat(sq.Dollar).RunWith(p.db).Delete(establishmentsTableName).Exec() // I prefer a truncate but squirell no support that
 	if err != nil {
 		return fmt.Errorf("error executing insert establishment: %w", err)
 	}
 
-	p.logger.Info("db population from file started")
 	err = loadFromFile(p.logger, path, func(establishment *Establishment) error {
 		builder := sq.StatementBuilder.PlaceholderFormat(sq.Dollar).RunWith(p.db)
 		_, err := builder.Insert(establishmentsTableName).

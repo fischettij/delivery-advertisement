@@ -1,0 +1,28 @@
+config:
+  target: http://localhost:8080
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      rampTo: 50
+      name: Warm up phase
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 100
+      name: Ramp up load
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 200
+      name: Spike phase
+  plugins:
+  apdex:
+    threshold: 100
+  ensure:
+    thresholds:
+      - http.response_time.p99: 100
+      - http.response_time.p95: 75
+scenarios:
+  - flow:
+      - loop:
+          - get:
+              url: "/delivery-services?lat={{$randomNumber(0, 90)}}.{{$randomNumber(1, 1000000)}}&lon={{$randomNumber(0, 180)}}.{{ $randomNumber(0, 1000000) }}"
+        count: 100
