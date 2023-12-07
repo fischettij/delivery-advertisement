@@ -49,7 +49,7 @@ func (m *Manager) Start(done chan<- error) {
 				done <- err
 				return
 			}
-			if md5 != m.csvVcersion {
+			if md5 != m.csvVersion {
 				m.csvVersion = md5
 				err = m.storage.LoadFromFile(fileName)
 				if err != nil {
